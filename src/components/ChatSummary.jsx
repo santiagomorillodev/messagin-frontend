@@ -128,6 +128,7 @@ export const ChatSummary = ({ idUser, conversationId }) => {
         });
       } catch {}
     } else {
+      console.log(id,name,chatId)
       navigate("/direct", {
         state: {
           id,

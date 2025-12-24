@@ -51,7 +51,7 @@ const remoteAudio = callApi?.remoteAudio;
   const { messages = [], loading = false } = useGetMessages({
     conversationId: chatId
   });
-  console.log(messages)
+  console.log({'Mensajes': messages})
   useEffect(() => {
     if (!loading && initialLoad) {
       setLiveMessages(messages || []);

@@ -136,6 +136,10 @@ const remoteAudio = callApi?.remoteAudio;
     setListDelete([]);
   };
 
+  console.log('📍 Datos de location.state:', chatData);
+console.log('🔑 chatId obtenido:', chatId);
+console.log('🔗 URL completa:', window.location.href);
+
   if (!currentUser) return <p className="text-white">Cargando usuario...</p>;
   if (!name)
     return (

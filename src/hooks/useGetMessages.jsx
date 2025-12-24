@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 export default function useGetMessages({conversationId}) {
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
-  
+    console.log(messages)
     useEffect(() => {
       async function fetchMessages() {
         try {
@@ -18,7 +18,6 @@ export default function useGetMessages({conversationId}) {
         } finally {
           setLoading(false);
         }
-        console.log(messages)
       }
     
       return () => {

@@ -18,6 +18,7 @@ export default function useGetMessages({conversationId}) {
         } finally {
           setLoading(false);
         }
+        console.log(messages)
       }
     
       return () => {

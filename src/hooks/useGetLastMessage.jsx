@@ -23,12 +23,15 @@ export default function useGetLastMessage(conversationId) {
     async function fetchLastMessage() {
       setLoading(true);
       setError(null);
+      console.log('entrando al componente')
       try {
         const res = await fetch(`https://messagin-backend.onrender.com/conversation/${conversationId}/last-message`, {
           method: "GET",
           credentials: "include",
           signal: controller.signal,
         });
+
+        
 
         if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
         const data = await res.json();

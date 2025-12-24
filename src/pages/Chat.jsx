@@ -9,7 +9,7 @@ import CallButton from "../components/CallButton";
 import { useCallContext } from "../context/CallContext"; 
 
 const Chat = () => {
-  const callApi = useCallContext();
+const callApi = useCallContext();
 
 const call = callApi?.call;
 const acceptCall = callApi?.acceptCall;
@@ -51,7 +51,7 @@ const remoteAudio = callApi?.remoteAudio;
   const { messages = [], loading = false } = useGetMessages({
     conversationId: chatId
   });
-
+  console.log(messages)
   useEffect(() => {
     if (!loading && initialLoad) {
       setLiveMessages(messages || []);

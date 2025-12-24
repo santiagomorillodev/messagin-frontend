@@ -103,11 +103,12 @@ export const ChatSummary = ({ idUser, conversationId }) => {
   const handleClick = async () => {
     if (menu) return;
 
-    await fetch(`https://messagin-backend.onrender.com/inbox/message/change-status/${chatId}`, {
+    const response = await fetch(`https://messagin-backend.onrender.com/inbox/message/change-status/${chatId}`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
     });
+    console.log(response)
 
     setUnreadByConversation((prev) => ({
       ...prev,

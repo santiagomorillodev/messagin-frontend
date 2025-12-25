@@ -51,33 +51,54 @@ export function WebSocketProvider({ children }) {
   // WEBSOCKET HANDLING
   // ========================================================
   const connectSocket = () => {
-    if (!currentUser?.id) return;
-    console.error('No hay current user id')
-    console.log(currentUser)
+  if (!currentUser?.id) {
+    console.log('No hay current user id, esperando...'); // Cambiar de error a log
+    return;
+  }
 
-    // Si ya existe, no vuelvas a abrir
-    if (socketRef.current?.readyState === WebSocket.OPEN) return;
+  // Si ya existe y está abierto, no hacer nada
+  if (socketRef.current?.readyState === WebSocket.OPEN) {
+    console.log('WebSocket ya está abierto');
+    return;
+  }
 
-    const ws = new WebSocket(`wss://messagin-backend.onrender.com/ws/user/${currentUser.id}`);
+  // Si está en estado de conexión o cerrando, no crear uno nuevo
+  if (socketRef.current?.readyState === WebSocket.CONNECTING) {
+    console.log('WebSocket ya está conectando...');
+    return;
+  }
 
-    socketRef.current = ws;
-    setWsInstance(ws);
+  console.log('Conectando WebSocket para usuario:', currentUser.id);
+  
+  const ws = new WebSocket(`wss://messagin-backend.onrender.com/ws/user/${currentUser.id}`);
 
-    ws.onopen = () => {
-      setConnected(true);
-      reloadUnread();
-      if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
-    };
+  socketRef.current = ws;
+  setWsInstance(ws);
 
-    ws.onclose = () => {
-      setConnected(false);
+  ws.onopen = () => {
+    console.log('WebSocket conectado exitosamente');
+    setConnected(true);
+    reloadUnread();
+    if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
+    reconnectTimer.current = null;
+  };
+
+  ws.onclose = (event) => {
+    console.log(`WebSocket cerrado. Código: ${event.code}, Razón: ${event.reason}`);
+    setConnected(false);
+    socketRef.current = null;
+    setWsInstance(null);
+    
+    // Solo intentar reconectar si no fue un cierre intencional
+    if (event.code !== 1000) { // 1000 = cierre normal
       attemptReconnect();
-    };
+    }
+  };
 
-    ws.onerror = () => {
-      setConnected(false);
-      ws.close();
-    };
+  ws.onerror = (error) => {
+    console.error('Error en WebSocket:', error);
+    setConnected(false);
+  };
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -111,19 +132,41 @@ export function WebSocketProvider({ children }) {
   };
 
   // Intentar reconectar solo 1 vez cada 2 segundos
-  const attemptReconnect = () => {
-    if (reconnectTimer.current) return; // evita múltiples timers
-    reconnectTimer.current = setTimeout(() => {
-      reconnectTimer.current = null;
+  // En WebSocketProvider.jsx - modificar attemptReconnect
+const attemptReconnect = () => {
+  if (reconnectTimer.current) {
+    clearTimeout(reconnectTimer.current);
+    reconnectTimer.current = null;
+  }
+  
+  console.log('Intentando reconectar en 3 segundos...');
+  reconnectTimer.current = setTimeout(() => {
+    if (currentUser?.id) {
       connectSocket();
-    }, 2000);
-  };
+    }
+  }, 3000);
+};
 
   // Abrir socket cuando currentUser cambie
   useEffect(() => {
-    if (currentUser?.id) connectSocket();
-    return () => socketRef.current?.close();
-  }, [currentUser]);
+  if (currentUser?.id) {
+    console.log('Usuario disponible, conectando WebSocket');
+    connectSocket();
+  } else {
+    console.log('Usuario no disponible, cerrando WebSocket si existe');
+    if (socketRef.current) {
+      disconnectSocket();
+    }
+  }
+  
+  return () => {
+    // Limpiar timer al desmontar
+    if (reconnectTimer.current) {
+      clearTimeout(reconnectTimer.current);
+      reconnectTimer.current = null;
+    }
+  };
+}, [currentUser]);
 
   // ========================================================
   // API pública para enviar mensajes por WebSocket

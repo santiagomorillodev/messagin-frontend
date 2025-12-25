@@ -83,51 +83,37 @@ const remoteAudio = callApi?.remoteAudio;
   }, [socket, chatId]);
 
   const sendMessage = () => {
-    console.log('🔌 [WebSocket] Estado del socket:', socket?.readyState);
-  console.log('🔌 [WebSocket] Socket object:', socket);
-  console.log('🔌 [WebSocket] WebSocket.OPEN:', WebSocket.OPEN);
-  
-  if (!socket) {
-    console.error('❌ [WebSocket] socket es null/undefined');
+  // Usar la función send del contexto en lugar de socket.send directamente
+  if (!send) {
+    console.error('❌ send function no disponible en contexto');
     return;
   }
-  
-  if (socket.readyState !== WebSocket.OPEN) {
-    console.error('❌ [WebSocket] Socket NO está abierto. Estado:', socket.readyState);
-    console.error('❌ Estados posibles: 0=CONNECTING, 1=OPEN, 2=CLOSING, 3=CLOSED');
-    
-    // Intentar reconectar
-    console.log('🔄 Intentando reconectar WebSocket...');
-    // Puedes necesitar lógica de reconexión aquí
-    return;
-  }
-    if (!socket || socket.readyState !== WebSocket.OPEN) return;
 
-    const payload = {
-      sender_id: currentUser.id,
-      recipient_id: otherUserId,
-      conversation_id: chatId,
-      content: inputContent || null,
-      image_base64: null
+  const payload = {
+    sender_id: currentUser.id,
+    recipient_id: otherUserId,
+    conversation_id: chatId,
+    content: inputContent || null,
+    image_base64: null
+  };
+
+  if (selectedImage) {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      payload.image_base64 = reader.result;
+      send(payload); // Usar la función del contexto
+      setSelectedImage(null);
+      setInputContent("");
     };
 
-    if (selectedImage) {
-      const reader = new FileReader();
+    reader.readAsDataURL(selectedImage);
+    return;
+  }
 
-      reader.onload = () => {
-        payload.image_base64 = reader.result;
-        socket.send(JSON.stringify(payload));
-        setSelectedImage(null);
-        setInputContent("");
-      };
-
-      reader.readAsDataURL(selectedImage);
-      return;
-    }
-
-    send(JSON.stringify(payload));
-    setInputContent("");
-  };
+  send(payload); // Usar la función del contexto
+  setInputContent("");
+};
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {

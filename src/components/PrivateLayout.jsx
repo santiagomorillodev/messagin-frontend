@@ -1,5 +1,4 @@
 import { Outlet } from "react-router-dom";
-import { CallProvider } from "../context/CallContext";
 import useGetCurrentUser from "../hooks/useGetCurrentUser";
 
 export default function PrivateLayout() {
@@ -7,9 +6,5 @@ export default function PrivateLayout() {
 
   if (!currentUser) return null;
 
-  return (
-    <CallProvider>
-      <Outlet />
-    </CallProvider>
-  );
+  return <Outlet />; // ← SIN providers extra, SOLO Outlet
 }

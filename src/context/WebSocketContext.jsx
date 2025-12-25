@@ -52,6 +52,8 @@ export function WebSocketProvider({ children }) {
   // ========================================================
   const connectSocket = () => {
     if (!currentUser?.id) return;
+    console.error('No hay current user id')
+    console.log(currentUser)
 
     // Si ya existe, no vuelvas a abrir
     if (socketRef.current?.readyState === WebSocket.OPEN) return;

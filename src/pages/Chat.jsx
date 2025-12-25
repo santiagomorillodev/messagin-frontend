@@ -51,7 +51,6 @@ const remoteAudio = callApi?.remoteAudio;
   const { messages = [], loading = false } = useGetMessages({
     conversationId: chatId
   });
-  console.log({'Mensajes': messages})
   useEffect(() => {
     if (!loading && initialLoad) {
       setLiveMessages(messages || []);
@@ -84,6 +83,24 @@ const remoteAudio = callApi?.remoteAudio;
   }, [socket, chatId]);
 
   const sendMessage = () => {
+    console.log('🔌 [WebSocket] Estado del socket:', socket?.readyState);
+  console.log('🔌 [WebSocket] Socket object:', socket);
+  console.log('🔌 [WebSocket] WebSocket.OPEN:', WebSocket.OPEN);
+  
+  if (!socket) {
+    console.error('❌ [WebSocket] socket es null/undefined');
+    return;
+  }
+  
+  if (socket.readyState !== WebSocket.OPEN) {
+    console.error('❌ [WebSocket] Socket NO está abierto. Estado:', socket.readyState);
+    console.error('❌ Estados posibles: 0=CONNECTING, 1=OPEN, 2=CLOSING, 3=CLOSED');
+    
+    // Intentar reconectar
+    console.log('🔄 Intentando reconectar WebSocket...');
+    // Puedes necesitar lógica de reconexión aquí
+    return;
+  }
     if (!socket || socket.readyState !== WebSocket.OPEN) return;
 
     const payload = {
@@ -136,9 +153,6 @@ const remoteAudio = callApi?.remoteAudio;
     setListDelete([]);
   };
 
-  console.log('📍 Datos de location.state:', chatData);
-console.log('🔑 chatId obtenido:', chatId);
-console.log('🔗 URL completa:', window.location.href);
 
   if (!currentUser) return <p className="text-white">Cargando usuario...</p>;
   if (!name)

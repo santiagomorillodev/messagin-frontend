@@ -1,3 +1,4 @@
+// App.jsx - VERSIÓN FINAL SIMPLE
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Login } from "./pages/Login";
@@ -69,6 +70,7 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
+          {/* 🔧 RUTAS PRIVADAS - PrivateLayout SIMPLE */}
           <Route element={<PrivateLayout />}>
             <Route
               path="/inbox"
